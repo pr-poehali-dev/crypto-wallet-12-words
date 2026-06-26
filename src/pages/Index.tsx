@@ -4,11 +4,11 @@ import Icon from '@/components/ui/icon';
 type TabId = 'home' | 'recovery' | 'balance' | 'security';
 
 const ASSETS_REAL = [
-  { sym: 'BTC', name: 'Bitcoin', amount: '0.8421', usd: 71284.5, change: +2.41, color: '#f7931a', icon: 'Bitcoin', dust: 59823.12 },
-  { sym: 'ETH', name: 'Ethereum', amount: '12.084', usd: 3512.8, change: +1.12, color: '#627eea', icon: 'Gem', dust: 42438.69 },
-  { sym: 'USDT', name: 'Tether', amount: '18 500', usd: 1.0, change: -0.01, color: '#26a17b', icon: 'DollarSign', dust: 18500.0 },
-  { sym: 'SOL', name: 'Solana', amount: '210.5', usd: 178.32, change: +5.84, color: '#14f195', icon: 'Zap', dust: 37536.36 },
-  { sym: 'TON', name: 'Toncoin', amount: '4 820', usd: 6.74, change: -1.23, color: '#0098ea', icon: 'Send', dust: 32486.8 },
+  { sym: 'BTC', name: 'Bitcoin', amount: '0.0058', usd: 71284.5, change: +2.41, color: '#f7931a', icon: 'Bitcoin', dust: 413.45 },
+  { sym: 'ETH', name: 'Ethereum', amount: '0.0820', usd: 3512.8, change: +1.12, color: '#627eea', icon: 'Gem', dust: 288.05 },
+  { sym: 'USDT', name: 'Tether', amount: '200', usd: 1.0, change: -0.01, color: '#26a17b', icon: 'DollarSign', dust: 200.0 },
+  { sym: 'SOL', name: 'Solana', amount: '0.550', usd: 178.32, change: +5.84, color: '#14f195', icon: 'Zap', dust: 98.08 },
+  { sym: 'TON', name: 'Toncoin', amount: '0', usd: 6.74, change: -1.23, color: '#0098ea', icon: 'Send', dust: 0 },
 ];
 
 const ASSETS_LOCKED = [
@@ -205,7 +205,7 @@ function HomeTab({ totalUsd, unlocked, assets }: { totalUsd: number; unlocked: b
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
           <StatCard label="активов" value="5" sub="в кошельке" icon="Coins" />
-          <StatCard label="за 24ч" value={unlocked ? '+$2 184' : '$0'} sub={unlocked ? 'прибыль' : 'скрыто'} icon="LineChart" accent />
+          <StatCard label="за 24ч" value={unlocked ? '+$18' : '$0'} sub={unlocked ? 'прибыль' : 'скрыто'} icon="LineChart" accent />
         </div>
       </div>
 
@@ -217,7 +217,7 @@ function HomeTab({ totalUsd, unlocked, assets }: { totalUsd: number; unlocked: b
           </div>
           <div className="flex h-3 rounded-full overflow-hidden mb-4">
             {ASSETS.map((a) => (
-              <div key={a.sym} style={{ width: `${(a.dust / 190785) * 100}%`, background: a.color }} />
+              <div key={a.sym} style={{ width: `${(a.dust / 999.58) * 100}%`, background: a.color }} />
             ))}
           </div>
           <div className="space-y-2">
