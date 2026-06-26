@@ -112,7 +112,7 @@ export default function Index({ unlocked = false, onLogout }: { unlocked?: boole
           ))}
         </nav>
 
-        {tab === 'home' && <HomeTab totalUsd={totalUsd} unlocked={unlocked} />}
+        {tab === 'home' && <HomeTab totalUsd={totalUsd} unlocked={unlocked} assets={ASSETS} />}
         {tab === 'balance' && <BalanceTab unlocked={unlocked} />}
         {tab === 'recovery' && (
           <RecoveryTab revealSeed={revealSeed} setRevealSeed={setRevealSeed} />
@@ -140,7 +140,8 @@ function StatCard({ label, value, sub, icon, accent }: { label: string; value: s
   );
 }
 
-function HomeTab({ totalUsd, unlocked }: { totalUsd: number; unlocked: boolean }) {
+function HomeTab({ totalUsd, unlocked, assets }: { totalUsd: number; unlocked: boolean; assets: typeof ASSETS_REAL }) {
+  const ASSETS = assets;
   return (
     <div className="space-y-6 animate-fade-in">
       {!unlocked && (
