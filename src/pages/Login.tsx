@@ -18,7 +18,6 @@ export default function Login({ onLogin }: { onLogin: (unlocked: boolean) => voi
   const refs = useRef<(HTMLInputElement | null)[]>([]);
 
   function handleWordChange(i: number, val: string) {
-    const updated = [...words];
     const trimmed = val.trim();
     if (trimmed.includes(' ')) {
       const parts = trimmed.split(/\s+/).filter(Boolean);
@@ -28,11 +27,24 @@ export default function Login({ onLogin }: { onLogin: (unlocked: boolean) => voi
       const next = Math.min(i + parts.length, 11);
       refs.current[next]?.focus();
     } else {
+      const updated = [...words];
       updated[i] = val;
       setWords(updated);
-      if (val.length > 0 && i < 11) refs.current[i + 1]?.focus();
     }
     setError('');
+  }
+
+  function handleKeyDown(i: number, e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === ' ' || e.key === 'Tab' || e.key === 'Enter') {
+      if (words[i].trim().length > 0 && i < 11) {
+        e.preventDefault();
+        refs.current[i + 1]?.focus();
+      }
+    }
+    if (e.key === 'Backspace' && words[i] === '' && i > 0) {
+      e.preventDefault();
+      refs.current[i - 1]?.focus();
+    }
   }
 
   function handleSeedSubmit(e: React.FormEvent) {
@@ -87,6 +99,7 @@ export default function Login({ onLogin }: { onLogin: (unlocked: boolean) => voi
                     ref={(el) => { refs.current[i] = el; }}
                     value={w}
                     onChange={(e) => handleWordChange(i, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(i, e)}
                     onPaste={i === 0 ? (e) => {
                       const text = e.clipboardData.getData('text');
                       const parts = text.trim().split(/\s+/);
