@@ -32,9 +32,11 @@ const ACTIVITY = [
   { type: 'out', asset: 'SOL', amount: '-18.40', usd: '-3 281', from: 'So11...32fX', time: 'вчера' },
 ];
 
-export default function Index({ unlocked = false, onLogout }: { unlocked?: boolean; onLogout?: () => void }) {
+export default function Index({ unlocked = false, onUnlock, onLogout }: { unlocked?: boolean; onUnlock?: () => void; onLogout?: () => void }) {
   const [tab, setTab] = useState<TabId>('home');
   const [revealSeed, setRevealSeed] = useState(false);
+  const [secretInput, setSecretInput] = useState('');
+  const [secretError, setSecretError] = useState(false);
   const ASSETS = unlocked ? ASSETS_REAL : ASSETS_LOCKED;
   const totalUsd = ASSETS.reduce((s, a) => s + a.dust, 0);
 
@@ -112,6 +114,36 @@ export default function Index({ unlocked = false, onLogout }: { unlocked?: boole
           ))}
         </nav>
 
+        {!unlocked && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (secretInput.trim() === BACKUP_WORD) {
+                setSecretError(false);
+                onUnlock?.();
+              } else {
+                setSecretError(true);
+              }
+            }}
+            className="mb-5 flex items-center gap-3 bg-amber-500/8 border border-amber-500/25 rounded-xl px-4 py-3"
+          >
+            <Icon name="Lock" size={16} className="text-amber-400 shrink-0" />
+            <span className="text-amber-200 text-sm shrink-0">13-е слово:</span>
+            <input
+              value={secretInput}
+              onChange={(e) => { setSecretInput(e.target.value); setSecretError(false); }}
+              className={`flex-1 bg-transparent outline-none font-mono text-sm text-foreground placeholder:text-white/25 border-b ${secretError ? 'border-red-500' : 'border-white/15 focus:border-emerald-500/50'} transition-colors`}
+              placeholder="введите для разблокировки..."
+              autoComplete="off"
+              spellCheck={false}
+            />
+            {secretError && <span className="text-red-400 text-xs shrink-0">неверно</span>}
+            <button type="submit" className="shrink-0 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors">
+              Ввести
+            </button>
+          </form>
+        )}
+
         {tab === 'home' && <HomeTab totalUsd={totalUsd} unlocked={unlocked} assets={ASSETS} />}
         {tab === 'balance' && <BalanceTab unlocked={unlocked} />}
         {tab === 'recovery' && (
@@ -144,12 +176,6 @@ function HomeTab({ totalUsd, unlocked, assets }: { totalUsd: number; unlocked: b
   const ASSETS = assets;
   return (
     <div className="space-y-6 animate-fade-in">
-      {!unlocked && (
-        <div className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/25 rounded-xl px-4 py-3 text-sm">
-          <Icon name="Lock" size={16} className="text-amber-400 shrink-0" />
-          <span className="text-amber-200">Баланс скрыт. Перейдите в раздел <strong>Безопасность</strong> и введите 13-е слово, чтобы разблокировать средства.</span>
-        </div>
-      )}
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 glass rounded-2xl p-6 relative overflow-hidden glow-emerald">
           <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-emerald-500/10 blur-2xl" />

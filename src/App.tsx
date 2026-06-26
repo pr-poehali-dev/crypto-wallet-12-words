@@ -12,9 +12,13 @@ const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
 
-  function handleLogin(isUnlocked: boolean) {
+  function handleLogin() {
     setLoggedIn(true);
-    setUnlocked(isUnlocked);
+    setUnlocked(false);
+  }
+
+  function handleUnlock() {
+    setUnlocked(true);
   }
 
   function handleLogout() {
@@ -30,7 +34,7 @@ const App = () => {
         {!loggedIn ? (
           <Login onLogin={handleLogin} />
         ) : (
-          <Index unlocked={unlocked} onLogout={handleLogout} />
+          <Index unlocked={unlocked} onUnlock={handleUnlock} onLogout={handleLogout} />
         )}
       </TooltipProvider>
     </QueryClientProvider>
