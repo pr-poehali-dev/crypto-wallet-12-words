@@ -3,7 +3,7 @@ import Icon from '@/components/ui/icon';
 
 type TabId = 'home' | 'recovery' | 'balance' | 'security';
 
-const ASSETS = [
+const ASSETS_REAL = [
   { sym: 'BTC', name: 'Bitcoin', amount: '0.8421', usd: 71284.5, change: +2.41, color: '#f7931a', icon: 'Bitcoin', dust: 59823.12 },
   { sym: 'ETH', name: 'Ethereum', amount: '12.084', usd: 3512.8, change: +1.12, color: '#627eea', icon: 'Gem', dust: 42438.69 },
   { sym: 'USDT', name: 'Tether', amount: '18 500', usd: 1.0, change: -0.01, color: '#26a17b', icon: 'DollarSign', dust: 18500.0 },
@@ -11,11 +11,19 @@ const ASSETS = [
   { sym: 'TON', name: 'Toncoin', amount: '4 820', usd: 6.74, change: -1.23, color: '#0098ea', icon: 'Send', dust: 32486.8 },
 ];
 
+const ASSETS_LOCKED = [
+  { sym: 'BTC', name: 'Bitcoin', amount: '0.0000', usd: 71284.5, change: +2.41, color: '#f7931a', icon: 'Bitcoin', dust: 0 },
+  { sym: 'ETH', name: 'Ethereum', amount: '0.0000', usd: 3512.8, change: +1.12, color: '#627eea', icon: 'Gem', dust: 0 },
+  { sym: 'USDT', name: 'Tether', amount: '0', usd: 1.0, change: -0.01, color: '#26a17b', icon: 'DollarSign', dust: 0 },
+  { sym: 'SOL', name: 'Solana', amount: '0.0000', usd: 178.32, change: +5.84, color: '#14f195', icon: 'Zap', dust: 0 },
+  { sym: 'TON', name: 'Toncoin', amount: '0', usd: 6.74, change: -1.23, color: '#0098ea', icon: 'Send', dust: 0 },
+];
+
 const SEED = [
   'orbit', 'velvet', 'tunnel', 'harvest', 'crimson', 'nebula',
   'anchor', 'puzzle', 'meadow', 'quartz', 'silent', 'glacier',
 ];
-const BACKUP_WORD = 'phoenix';
+const BACKUP_WORD = 'Kirill';
 
 const ACTIVITY = [
   { type: 'in', asset: 'BTC', amount: '+0.1240', usd: '+8 479', from: 'bc1q...8f3a', time: '12:04' },
@@ -24,9 +32,10 @@ const ACTIVITY = [
   { type: 'out', asset: 'SOL', amount: '-18.40', usd: '-3 281', from: 'So11...32fX', time: 'вчера' },
 ];
 
-export default function Index() {
+export default function Index({ unlocked = false, onLogout }: { unlocked?: boolean; onLogout?: () => void }) {
   const [tab, setTab] = useState<TabId>('home');
   const [revealSeed, setRevealSeed] = useState(false);
+  const ASSETS = unlocked ? ASSETS_REAL : ASSETS_LOCKED;
   const totalUsd = ASSETS.reduce((s, a) => s + a.dust, 0);
 
   const tabs: { id: TabId; label: string; icon: string }[] = [
@@ -64,13 +73,25 @@ export default function Index() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="hidden sm:flex items-center gap-2 glass rounded-lg px-3 py-1.5 font-mono text-xs">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse-glow" />
-              синхронизировано
-            </div>
+            {unlocked ? (
+              <div className="hidden sm:flex items-center gap-2 glass rounded-lg px-3 py-1.5 font-mono text-xs text-emerald-400">
+                <Icon name="Unlock" size={13} />
+                разблокировано
+              </div>
+            ) : (
+              <div className="hidden sm:flex items-center gap-2 glass rounded-lg px-3 py-1.5 font-mono text-xs text-amber-400">
+                <Icon name="Lock" size={13} />
+                баланс скрыт
+              </div>
+            )}
             <button className="h-9 w-9 glass rounded-lg flex items-center justify-center hover:border-emerald-500/40 transition-colors">
               <Icon name="Bell" size={16} />
             </button>
+            {onLogout && (
+              <button onClick={onLogout} className="h-9 w-9 glass rounded-lg flex items-center justify-center hover:border-red-500/30 text-muted-foreground hover:text-red-400 transition-colors">
+                <Icon name="LogOut" size={16} />
+              </button>
+            )}
           </div>
         </header>
 
@@ -91,8 +112,8 @@ export default function Index() {
           ))}
         </nav>
 
-        {tab === 'home' && <HomeTab totalUsd={totalUsd} />}
-        {tab === 'balance' && <BalanceTab />}
+        {tab === 'home' && <HomeTab totalUsd={totalUsd} unlocked={unlocked} />}
+        {tab === 'balance' && <BalanceTab unlocked={unlocked} />}
         {tab === 'recovery' && (
           <RecoveryTab revealSeed={revealSeed} setRevealSeed={setRevealSeed} />
         )}
@@ -119,20 +140,28 @@ function StatCard({ label, value, sub, icon, accent }: { label: string; value: s
   );
 }
 
-function HomeTab({ totalUsd }: { totalUsd: number }) {
+function HomeTab({ totalUsd, unlocked }: { totalUsd: number; unlocked: boolean }) {
   return (
     <div className="space-y-6 animate-fade-in">
+      {!unlocked && (
+        <div className="flex items-center gap-3 bg-amber-500/10 border border-amber-500/25 rounded-xl px-4 py-3 text-sm">
+          <Icon name="Lock" size={16} className="text-amber-400 shrink-0" />
+          <span className="text-amber-200">Баланс скрыт. Перейдите в раздел <strong>Безопасность</strong> и введите 13-е слово, чтобы разблокировать средства.</span>
+        </div>
+      )}
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 glass rounded-2xl p-6 relative overflow-hidden glow-emerald">
           <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full bg-emerald-500/10 blur-2xl" />
           <p className="text-sm text-muted-foreground font-mono">Общий баланс</p>
           <div className="flex items-end gap-3 mt-1">
             <span className="font-mono font-extrabold text-4xl sm:text-5xl text-glow">
-              ${totalUsd.toLocaleString('ru-RU', { maximumFractionDigits: 0 })}
+              {unlocked ? `$${totalUsd.toLocaleString('ru-RU', { maximumFractionDigits: 0 })}` : '$0'}
             </span>
-            <span className="text-emerald-400 font-mono text-sm mb-2 flex items-center gap-1">
-              <Icon name="TrendingUp" size={15} /> +3.18%
-            </span>
+            {unlocked && (
+              <span className="text-emerald-400 font-mono text-sm mb-2 flex items-center gap-1">
+                <Icon name="TrendingUp" size={15} /> +3.18%
+              </span>
+            )}
           </div>
           <div className="flex flex-wrap gap-2 mt-5">
             {[
@@ -149,7 +178,7 @@ function HomeTab({ totalUsd }: { totalUsd: number }) {
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
           <StatCard label="активов" value="5" sub="в кошельке" icon="Coins" />
-          <StatCard label="за 24ч" value="+$2 184" sub="прибыль" icon="LineChart" accent />
+          <StatCard label="за 24ч" value={unlocked ? '+$2 184' : '$0'} sub={unlocked ? 'прибыль' : 'скрыто'} icon="LineChart" accent />
         </div>
       </div>
 
@@ -207,7 +236,8 @@ function HomeTab({ totalUsd }: { totalUsd: number }) {
   );
 }
 
-function BalanceTab() {
+function BalanceTab({ unlocked }: { unlocked: boolean }) {
+  const ASSETS = unlocked ? ASSETS_REAL : ASSETS_LOCKED;
   return (
     <div className="space-y-3 animate-fade-in">
       {ASSETS.map((a, i) => (
